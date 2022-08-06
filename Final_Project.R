@@ -1,5 +1,6 @@
 library(tidyverse)
 library(spotifyr)
+library(patchwork)
 library(plotly)
 
 
@@ -45,7 +46,8 @@ ts_graph<- ggplot(data = ts_audio_clean,
                      y = energy,
                      color = album_name, 
                      text = track_name))+ 
-  geom_point(alpha = 1)+ 
+  geom_hline(yintercept = 0.5)+
+  geom_point(size = 2)+ 
   scale_color_manual(values = c("deepskyblue2",
                                 "lightsalmon4",
                                 "goldenrod",
@@ -61,10 +63,58 @@ ts_graph<- ggplot(data = ts_audio_clean,
        color = "Album")+ 
   annotate(geom = "label", x = "A#", y = 0, label = "Low")+ 
   annotate(geom = "label", x = "A#", y = 1, label = "High")+ 
-  theme_linedraw()
+  theme_linedraw()+ 
+  theme(legend.position = "right")
 
 ggplotly(ts_graph, tooltip = "text")
 
+ts_graph
+
+# Bach? --------------------------------------------------------------
+
+#results <- search_spotify("J. S. Bach", type = "artist")
+bach_id <- "5aIqB5nVVvmFsvSdExz408"
+
+
+#bach_raw <- get_artist_albums(bach_id)
+
+#bach_audio_raw <- get_artist_audio_features(bach_id)
+#saveRDS(bach_audio_raw, "bach_audio.rds")
+bach_audio_raw <- readRDS("bach_audio.rds")
+
+bach_albums <- c("J. S. Bach: Cantatas", "Invention", "Bach on Porthan Organ")
+ 
+bach_cleaned <- bach_audio_raw %>% 
+  filter(album_name %in% bach_albums) %>% 
+  select(key_mode, track_name, energy, album_name, 
+         duration_ms, time_signature)
 
 
 
+bach_graph <- bach_cleaned %>%  
+  ggplot(mapping = aes(x = key_mode, 
+         y = energy, 
+         color = album_name, 
+         text = track_name))+ 
+  geom_hline(yintercept = 0.5)+
+  geom_point(size = 2.5, alpha = 0.75) + 
+  scale_color_manual(values = c("lightpink3",
+                                "paleturquoise4",
+                                "thistle4"))+ 
+  scale_y_continuous(breaks = c(0.0, 0.25, 0.50, 0.75, 1.00)) + 
+  coord_cartesian(ylim = c(0.0, 1.00))+ 
+  theme_linedraw()+
+  theme(axis.text.x = element_text(angle = 90), legend.position = "left")+ 
+  labs(title = "Energy by Key (J. S. Bach)", 
+       x = "Key", 
+       y = "Energy",
+       color = "Album")+ 
+  annotate(geom = "label", x = "A# minor", y = 0, label = "Low")+ 
+  annotate(geom = "label", x = "A# minor", y = 1, label = "High") 
+
+bach_graph
+
+ggplotly(bach_graph, tooltip = "text")
+  
+
+bach_graph + ts_graph
