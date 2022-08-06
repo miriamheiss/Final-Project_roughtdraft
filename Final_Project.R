@@ -21,7 +21,7 @@ ts_albums_raw <- readRDS("ts_albums.rds")
 ts_audio_raw <- readRDS("ts_audio.rds")
 
 
-# Clean data --------------------------------------------------------------
+# Taylor Swift --------------------------------------------------------------
 
 taylor_swift_albums <- ts_albums_raw %>% 
   group_by(name) %>%  
@@ -70,7 +70,7 @@ ggplotly(ts_graph, tooltip = "text")
 
 ts_graph
 
-# Bach? --------------------------------------------------------------
+# Bach --------------------------------------------------------------
 
 #results <- search_spotify("J. S. Bach", type = "artist")
 bach_id <- "5aIqB5nVVvmFsvSdExz408"
@@ -114,7 +114,113 @@ bach_graph <- bach_cleaned %>%
 
 bach_graph
 
+
 ggplotly(bach_graph, tooltip = "text")
   
+
+bach_graph + ts_graph
+
+
+# Bach with tempo/valence -------------------------------------------------------------- 
+
+bach_cleaned_with_tempo <- bach_audio_raw %>% 
+  filter(album_name %in% bach_albums) %>% 
+  select(key_mode, track_name, energy, album_name, 
+         duration_ms, time_signature, tempo, valence)
+
+bach_tempo <- bach_cleaned_with_tempo %>%
+  ggplot(mapping = aes(x = tempo,
+                       y = valence))+ 
+  coord_cartesian(ylim = c(0.0, 1))+
+  geom_point(aes(color = album_name), size = 2.5)+ 
+  geom_smooth(se = FALSE, method = "loess", formula = y~x, color = "black")+
+  theme_linedraw()+
+  theme(legend.position = "left")+
+  scale_color_manual(values = c("lightpink3",
+                                "paleturquoise4",
+                                "thistle4"))+ 
+  labs(title = "Valence by Tempo (J. S. Bach)",
+       x = "Tempo",
+       y = "Valence",
+       color = "Album")
+
+bach_tempo
+
+ # Taylor Swift with tempo/valence -------------------------------------------------------------- 
+
+ts_cleaned_with_tempo <- ts_audio_raw %>% 
+  filter(album_name %in% albums) %>% 
+  select(track_name, energy, key_name, album_name, 
+         duration_ms, time_signature, tempo, valence)
+
+ts_tempo <- ts_cleaned_with_tempo %>%   
+  ggplot(mapping = aes(x = tempo,
+                       y = valence))+ 
+  geom_point(aes( color = album_name),size = 2.5)+ 
+  geom_smooth(se = FALSE, color = "black", method = "loess", formula = y~x) +
+  theme_linedraw()+
+  theme(legend.position = "right")+ 
+  scale_color_manual(values = c("deepskyblue2",
+                                "lightsalmon4",
+                                "goldenrod",
+                                "seashell4",
+                                "palevioletred1",
+                                "darkred",
+                                "grey32",
+                                "orchid4",
+                                "palegreen4"))+ 
+  labs(title = "Valence by Tempo (Taylor Swift)", 
+       x = "Tempo",
+       y = "Valence",
+       color = "Album")
+
+
+# New Graph ---------------------------------------------------------------
+
+
+ts_duration <- ts_audio_raw %>% 
+  filter(album_name %in% albums) %>% 
+  select(duration_ms, album_name) %>% 
+  ggplot(mapping = aes(y = album_name,
+                       x = duration_ms,
+                       color = album_name))+ 
+  geom_point()+ 
+  scale_color_manual(values = c("deepskyblue2",
+                                "lightsalmon4",
+                                "goldenrod",
+                                "seashell4",
+                                "palevioletred1",
+                                "darkred",
+                                "grey32",
+                                "orchid4",
+                                "palegreen4"))+
+  scale_x_continuous(breaks = c(100000, 20000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000))
+
+
+ts_duration
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+bach_tempo + ts_tempo
 
 bach_graph + ts_graph
