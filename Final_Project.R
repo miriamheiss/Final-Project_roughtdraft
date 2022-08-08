@@ -193,9 +193,7 @@ ts_duration <- ts_audio_raw %>%
                                 "darkred",
                                 "grey32",
                                 "orchid4",
-                                "palegreen4"))+
-  scale_x_continuous(breaks = c(100000, 20000, 300000, 400000, 500000, 600000, 700000, 800000, 900000, 1000000))
-
+                                "palegreen4"))
 
 ts_duration
 
