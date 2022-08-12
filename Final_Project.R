@@ -144,7 +144,7 @@ bach_tempo <- bach_cleaned_with_tempo %>%
        y = "Valence",
        color = "Album")
 
-bach_tempo
+bach_tempo+ts_tempo
 
  # Taylor Swift with tempo/valence -------------------------------------------------------------- 
 
@@ -181,8 +181,9 @@ ts_tempo <- ts_cleaned_with_tempo %>%
 ts_duration <- ts_audio_raw %>% 
   filter(album_name %in% albums) %>% 
   select(duration_ms, album_name) %>% 
-  ggplot(mapping = aes(y = album_name,
-                       x = duration_ms,
+  mutate(minutes = duration_ms / 1000 / 60) %>% 
+  ggplot(mapping = aes(y = minutes,
+                       x = album_name,
                        color = album_name))+ 
   geom_point()+ 
   scale_color_manual(values = c("deepskyblue2",
@@ -195,10 +196,21 @@ ts_duration <- ts_audio_raw %>%
                                 "orchid4",
                                 "palegreen4"))
 
+
 ts_duration
 
 
 
+bach_duration <- bach_audio_raw %>% 
+  filter(album_name %in% bach_albums) %>%
+  # select(duration_ms, album_name) %>% 
+  mutate(minutes = duration_ms / 1000 / 60) %>% 
+  ggplot(mapping = aes(y = minutes,
+                       x = album_name,
+                       color = album_name))+ 
+  geom_point() 
+
+bach_duration
 
 
 
@@ -219,6 +231,3 @@ ts_duration
 
 
 
-bach_tempo + ts_tempo
-
-bach_graph + ts_graph
