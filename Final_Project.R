@@ -39,10 +39,10 @@ albums <- c("evermore (deluxe version)",
 
 ts_audio_clean <- ts_audio_raw %>% 
   filter(album_name %in% albums) %>% 
-  select(track_name, energy, key_name, album_name, duration_ms, time_signature)
+  select(track_name, energy, key_name, album_name, duration_ms, time_signature, key_mode)
 
 ts_graph<- ggplot(data = ts_audio_clean,
-       mapping = aes(x = key_name,
+       mapping = aes(x = key_mode,
                      y = energy,
                      color = album_name, 
                      text = track_name))+ 
